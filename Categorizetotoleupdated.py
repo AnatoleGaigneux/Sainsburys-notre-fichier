@@ -12,7 +12,7 @@ import sqlite3
 #import Solvers.classCHPProblem as pb
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 database_path = "Sainsburys.sqlite"
@@ -20,7 +20,7 @@ conn = sqlite3.connect(database_path)
 cur = conn.cursor()
 
 
-id_store_min =2000
+id_store_min =500
 id_store_max =2050
 
 time_start = 806448
@@ -102,28 +102,28 @@ for store_index in range(id_store_min, id_store_max ):
 #New.append(Res_cat2)
 #New.append(Res_cat3)
 
-#Old = []
-#Old.append(Res_cat4)
+Old = []
+Old.append(Res_cat4)
 #Old.append(Res_cat5)
 #Old.append(Res_cat6)
 
 print(np.transpose(Res_cat4))
-"""
-New_avg = np.average(New, axis=0)
-Old_avg = np.average(New, axis=0)
-Print("avg electricity demand of NEW stores is %s kW" % New_ele_avg)
-Print("avg electricity demand of OLD stores is %s kW" % Old_ele_avg)
-'''
-# cat1 = np.array(Res_cat1)
-# cat1_avg = np.average(cat1, axis = 0)
+
+#New_avg = np.average(np.transpose(New),axis=0)
+Old_avg = np.average(np.transpose(Old),axis=0)
+#Print("avg electricity demand of NEW stores is %s kW" % New_ele_avg)
+print("avg electricity demand of OLD stores is %s kW" % Old_avg)
+
+cat4 = np.array(Res_cat4)
+cat4_avg = np.average(cat4, axis = 0)
 
 
 plt.xlabel('')
 plt.ylabel('Ele demand')
-plt.axis([0, 300, 0, 200])
-plt.plot(cat1_avg, 'ro', label = 'cat1')
+plt.plot(np.transpose(cat4_avg), 'ro', label = 'cat4')
+plt.axis([0, len(Res_cat4), 0, 200])
+
 
 
 legend = plt.legend(loc='lower left')
 plt.show()
-"""
