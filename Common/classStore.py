@@ -107,7 +107,7 @@ class store:
             RawData = cur.fetchall()
             timeControl_start = RawData[0][0]
             timeControl_stop = RawData[-1][0]
-            if timeControl_start == time_start and timeControl_stop  == time_stop - 1:
+            if timeControl_start == time_start and timeControl_stop == time_stop - 1:
                  self.p_ele = np.array([elt[1] for elt in RawData]) 
                  self.p_gas = np.array([elt[2] for elt in RawData]) 
                  self.p_ele_exp = np.array([elt[3] for elt in RawData])  

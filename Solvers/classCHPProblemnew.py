@@ -11,7 +11,7 @@ import datetime
 import calendar
 import os
 import sys
-scriptpath = "../Common" # This is written in the Windows way of specifying paths, hopefully it works on Linux?
+scriptpath = "..\\Common" # This is written in the Windows way of specifying paths, hopefully it works on Linux?
 sys.path.append(os.path.abspath(scriptpath))
 import Common.classStore as st # Module is in seperate folder, hence the elaboration
 import Common.classTech as tc
@@ -24,7 +24,7 @@ import time # To time code, simply use start = time.clock() then print start - t
 
 
 #database_path = "C:\\Users\\GOBS\\Dropbox\\Uni\Other\\UROP - Salvador\\Niccolo_project\\Code\\Sainsburys.sqlite" # Path to database file
-database_path = "Sainsburys.sqlite" # Path to database file
+database_path = ".\\Sainsburys.sqlite" # Path to database file
 
 
 class CHPproblem:
@@ -899,16 +899,16 @@ class CHPproblem:
         check_psi[check_psi == 0] = 1
         if min(check_psi) < (psi_min):
             raise Exception("part load less than minimum part load")
-
+        biometh_CF=0.006
         gas_CF = 0.1840
         ele_CF = 0.370845
         mask000 = part_load > 0.01
         mask011 = (a_el * part_load + b_el) * mask000 > el_demand
         mask012 = (a_th * part_load + b_th) * mask000 > th_demand
-        carbon_CHP = ((a_fuel * part_load + b_fuel) * mask000 * gas_CF + (el_demand - (
+        carbon_CHP = ((a_fuel * part_load + b_fuel) * mask000 * biometh_CF + (el_demand - (
             a_el * part_load + b_el) * mask000) * (1 - mask011) * ele_CF + (th_demand - (
             a_th * part_load + b_th) * mask000) * (
-                      1 - mask012) / Boiler_eff * gas_CF) / 1000  # - ((a_el * part_load + b_el) * mask000 - el_demand) * (mask011) * ele_CF
+                      1 - mask012) / Boiler_eff * biometh_CF) / 1000  # - ((a_el * part_load + b_el) * mask000 - el_demand) * (mask011) * ele_CF
         BAU_carbon = (el_demand * ele_CF + th_demand / Boiler_eff * gas_CF) / 1000  # (tCO2)
         carbon_savings = (BAU_carbon - carbon_CHP)
         biomethane_usage=(a_fuel * part_load + b_fuel) * mask000 +(th_demand - (a_th * part_load + b_th) * mask000)

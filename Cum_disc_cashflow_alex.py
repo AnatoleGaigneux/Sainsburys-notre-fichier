@@ -2,7 +2,7 @@
 import sqlite3
 import Common.classStore as st
 import Common.classTech as tc
-import Solvers.classCHPProblem_alex as pb
+import Solvers.classCHPProblemnew as pb
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -55,7 +55,7 @@ for id_store in range(id_store_min, id_store_max ):
             else:
                 print("Not able to categorise")
             if category == 1:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV()
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
                 financials1.append(solution[4][4])
                 carbon1.append(solution[5][2])
                 store1.append(id_store)
@@ -64,7 +64,7 @@ for id_store in range(id_store_min, id_store_max ):
                 CHP1.append(solution[1])
 
             if category == 2:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV()
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
                 store2.append(id_store)
@@ -73,7 +73,7 @@ for id_store in range(id_store_min, id_store_max ):
                 CHP2.append(solution[1])
 
             if category == 3:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV()
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
                 financials3.append(solution[4][4])
                 carbon3.append(solution[5][2])
                 store3.append(id_store)
@@ -104,9 +104,9 @@ print('category1', CHP1)
 print('category2',CHP2)
 print('category3',CHP3)
 
-average1 = 5*np.average(carbon1)
-average2 = 5*np.average(carbon2)
-average3 = 5*np.average(carbon3)
+average1 = np.average(carbon1)
+average2 = np.average(carbon2)
+average3 = np.average(carbon3)
 print(average1, average2, average3)
 
 # Capex Calculation
@@ -144,7 +144,7 @@ ind = [width[0]/2, (cum_width[1]-cum_width[0])/2+cum_width[0], (cum_width[2]-cum
 
 plt.figure(3)
 p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='black')
-plt.xlabel('$tCO_2e$ savings')
+plt.xlabel('$tCO_2e$ yearly savings')
 plt.ylabel('$£/tCO_2e$')
 plt.title('MAC curves for each store category and CHP implementation 2016-17')
 plt.show()
