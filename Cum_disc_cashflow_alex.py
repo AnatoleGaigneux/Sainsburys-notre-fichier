@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import plotly as py
 import plotly.figure_factory as ff
 
-database_path = ".\\Sainsburys.sqlite"
+database_path = "Sainsburys.sqlite"
 conn = sqlite3.connect(database_path)
 cur = conn.cursor()
 
@@ -55,7 +55,7 @@ for id_store in range(id_store_min, id_store_max ):
             else:
                 print("Not able to categorise")
             if category == 1:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1])
                 financials1.append(solution[4][4])
                 carbon1.append(solution[5][2])
                 store1.append(id_store)
@@ -64,7 +64,7 @@ for id_store in range(id_store_min, id_store_max ):
                 CHP1.append(solution[1])
 
             if category == 2:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1])
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
                 store2.append(id_store)
@@ -73,7 +73,7 @@ for id_store in range(id_store_min, id_store_max ):
                 CHP2.append(solution[1])
 
             if category == 3:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.2,1,1,1])
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1])
                 financials3.append(solution[4][4])
                 carbon3.append(solution[5][2])
                 store3.append(id_store)
@@ -116,9 +116,9 @@ cat3_capex = np.sum(capex3)
 tot_capex = cat1_capex + cat2_capex + cat3_capex
 
 # Biomethane Quantity Calculation
-biometh_cat1 = np.sum(biomethane1)
-biometh_cat2 = np.sum(biomethane2)
-biometh_cat3 = np.sum(biomethane3)
+biometh_cat1 = np.sum(biomethane1)/10**6
+biometh_cat2 = np.sum(biomethane2)/10**6
+biometh_cat3 = np.sum(biomethane3)/10**6
 tot_biometh = biometh_cat1 + biometh_cat2 + biometh_cat3
 
 # Number of store per category
@@ -129,7 +129,7 @@ TotNumbStore = NumbStore1 + NumbStore2 + NumbStore3
 
 print(NumbStore1, NumbStore2, NumbStore3)
 
-data_matrix = [['Category', 'Number of Stores', 'CAPEX', 'BioMethane Quantity'],
+data_matrix = [['Category', 'Number of Stores', 'CAPEX (£)', 'BioMethane Quantity (GW/h)'],
                ['1', NumbStore1, cat1_capex, biometh_cat1],
                ['2', NumbStore2, cat2_capex, biometh_cat2],
                ['3', NumbStore3, cat3_capex, biometh_cat3],
@@ -143,7 +143,7 @@ cum_width = np.cumsum(width)
 ind = [width[0]/2, (cum_width[1]-cum_width[0])/2+cum_width[0], (cum_width[2]-cum_width[1])/2+cum_width[1]]
 
 plt.figure(3)
-p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='black')
+p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='none')
 plt.xlabel('$tCO_2e$ yearly savings')
 plt.ylabel('$£/tCO_2e$')
 plt.title('MAC curves for each store category and CHP implementation 2016-17')

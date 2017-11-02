@@ -24,7 +24,7 @@ import time # To time code, simply use start = time.clock() then print start - t
 
 
 #database_path = "C:\\Users\\GOBS\\Dropbox\\Uni\Other\\UROP - Salvador\\Niccolo_project\\Code\\Sainsburys.sqlite" # Path to database file
-database_path = ".\\Sainsburys.sqlite" # Path to database file
+database_path = "Sainsburys.sqlite" # Path to database file
 
 
 class CHPproblem:
@@ -899,7 +899,7 @@ class CHPproblem:
         check_psi[check_psi == 0] = 1
         if min(check_psi) < (psi_min):
             raise Exception("part load less than minimum part load")
-        biometh_CF=0.006
+        biometh_CF=0.0328
         gas_CF = 0.1840
         ele_CF = 0.370845
         mask000 = part_load > 0.01
