@@ -22,6 +22,8 @@ capex1, capex2, capex3 = ([] for i in range (3))
 carbon1, carbon2, carbon3 = ([] for i in range(3))
 biomethane1, biomethane2, biomethane3 = ([] for i in range(3))
 CHP1, CHP2, CHP3 = ([] for i in range(3))
+payback1, payback2, payback3 = ([] for i in range(3))
+
 for id_store in range(id_store_min, id_store_max ):
     goodIO = 0
     cur.execute('''SELECT Ele, Gas FROM Demand_Check Where Stores_id= {vn1}'''.format(vn1=id_store))
@@ -62,6 +64,7 @@ for id_store in range(id_store_min, id_store_max ):
                 capex1.append(solution[4][5])
                 biomethane1.append(solution[5][3])
                 CHP1.append(solution[1])
+                payback1.append(solution[4][1])
 
             if category == 2:
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1])
@@ -71,6 +74,7 @@ for id_store in range(id_store_min, id_store_max ):
                 capex2.append(solution[4][5])
                 biomethane2.append(solution[5][3])
                 CHP2.append(solution[1])
+                payback2.append(solution[4][1])
 
             if category == 3:
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1])
@@ -80,6 +84,7 @@ for id_store in range(id_store_min, id_store_max ):
                 capex3.append(solution[4][5])
                 biomethane3.append(solution[5][3])
                 CHP3.append(solution[1])
+                payback3.append(solution[4][1])
 
 
 '''plt.figure(1)
@@ -101,8 +106,8 @@ MAC = [-np.average(financials1)/abs(np.average(carbon1)),
        -np.average(financials2)/abs(np.average(carbon2)),
        -np.average(financials3)/abs(np.average(carbon3))]
 print('category1', CHP1)
-print('category2',CHP2)
-print('category3',CHP3)
+print('category2', CHP2)
+print('category3', CHP3)
 
 average1 = np.average(carbon1)
 average2 = np.average(carbon2)
@@ -126,6 +131,15 @@ NumbStore1 = len(store1)
 NumbStore2 = len(store2)
 NumbStore3 = len(store3)
 TotNumbStore = NumbStore1 + NumbStore2 + NumbStore3
+
+# Payback time
+Cat1_payback=np.average(payback1)
+Cat2_payback=np.average(payback2)
+Cat3_payback=np.average(payback3)
+print(Cat1_payback)
+print(Cat2_payback)
+print(Cat3_payback)
+
 
 print(NumbStore1, NumbStore2, NumbStore3)
 
