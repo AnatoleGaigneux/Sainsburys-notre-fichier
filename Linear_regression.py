@@ -23,7 +23,7 @@ time_start = 806448
 time_stop = 824016
 
 payback= []
-heat2power = []
+h2p = []
 Area = []
 
 for id_store in range(id_store_min, id_store_max ):
@@ -51,23 +51,23 @@ for id_store in range(id_store_min, id_store_max ):
 
             solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
             payback.append(solution[4][1])
-            heat2power.append(Gas/Ele)
+            h2p.append(Gas/Ele)
             Area.append(SurfaceArea)
                 
-# =============================================================================
-#             X = pd.DataFrame({'Area':np.transpose(Area)})
-#             ''' 'H2P':np.transpose(heat2power)'''
-#             target = pd.DataFrame({'payback':np.transpose(payback)})
-# =============================================================================
-             
+          
 #Split data into training/testing sets
-X_train = Area[:-25]
-X_test = Area[-25:]
-print(X_test)
+X1_train = Area[:-25]
+X1_test = Area[-25:]
+
+X2_train = h2p[:-25]
+X2_test = h2p[-25:]
+
+X_train = np.column_stack((X1_train,X2_train))
+X_test = np.column_stack((X1_test,X2_test))
 
 #Split targets into trainign/testing sets
-target_train = payback[:,-25]
-target_test = payback[-25,:]
+target_train = payback[:-25]
+target_test = payback[-25:]
            
             
 #fit a linear model
@@ -87,13 +87,26 @@ print("Mean squared error: %.2f" % mean_squared_error(target_test, target_pred))
 print('Variance score: %.2f' % r2_score(target_test, target_pred))
 
 # Plot outputs
-plt.scatter(X_test, target_test,  color='black')
-plt.plot(X_test, target_pred, color='blue', linewidth=2)
 
-plt.xticks(())
-plt.yticks(())
+fig = plt.figure(1)
+ax = Axes3D(fig)
+ax.scatter(X1_test, X2_test, target_test, zdir='z', s=20, c='r', depthshade=True)
+ax.plot(X1_test, X2_test, target_pred, zdir='z', c='b')
+ax.set_xlabel('Area (ft2)')
+ax.set_ylabel('HEat to power')
+ax.set_zlabel('Payback time')
+ax.tick_params(axis='both', which='major', pad=-5)
+plt.show()
 
-plt.show()            
+# =============================================================================
+# plt.scatter(X_test, target_test,  color='black')
+# plt.plot(X_test, target_pred, color='blue', linewidth=2)
+# 
+# plt.xticks(())
+# plt.yticks(())
+# 
+# =============================================================================
+           
 
 
                 
