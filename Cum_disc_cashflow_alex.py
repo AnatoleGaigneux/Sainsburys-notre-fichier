@@ -23,6 +23,7 @@ carbon1, carbon2, carbon3 = ([] for i in range(3))
 biomethane1, biomethane2, biomethane3 = ([] for i in range(3))
 CHP1, CHP2, CHP3 = ([] for i in range(3))
 payback1, payback2, payback3 = ([] for i in range(3))
+h2p = []
 
 
 
@@ -39,13 +40,15 @@ for id_store in range(id_store_min, id_store_max ):
 
     if goodIO == 1:
         cur.execute(
-            '''SELECT Area FROM Stores Where id= {vn1}'''.format(
+            '''SELECT Area, GD2016, ED2016 FROM Stores Where id= {vn1}'''.format(
                 vn1=id_store))
         Index = cur.fetchall()
         if not Index:
             pass
         else:
             Area = np.array([elt[0] for elt in Index])
+            Gas = np.array([elt[1] for elt in Index])
+            Ele = np.array([elt[2] for elt in Index])
 
             if Area <= 25000:
                 category = 1
@@ -87,6 +90,7 @@ for id_store in range(id_store_min, id_store_max ):
                 biomethane3.append(solution[5][3])
                 CHP3.append(solution[1])
                 payback3.append(solution[4][1])
+                h2p.append(Gas / Ele)
 
 
 '''plt.figure(1)
@@ -107,14 +111,14 @@ plt.show()'''
 MAC = [-np.average(financials1)/abs(np.average(carbon1)),
        -np.average(financials2)/abs(np.average(carbon2)),
        -np.average(financials3)/abs(np.average(carbon3))]
-print('category1', CHP1)
-print('category2', CHP2)
-print('category3', CHP3)
+#print('category1', CHP1)
+#print('category2', CHP2)
+#print('category3', CHP3)
 
 average1 = np.average(carbon1)
 average2 = np.average(carbon2)
 average3 = np.average(carbon3)
-print(average1, average2, average3)
+#print(average1, average2, average3)
 
 # Capex Calculation
 cat1_capex = np.sum(capex1)
@@ -138,21 +142,26 @@ TotNumbStore = NumbStore1 + NumbStore2 + NumbStore3
 Cat1_payback=np.average(payback1)
 Cat2_payback=np.average(payback2)
 Cat3_payback=np.average(payback3)
-print(Cat1_payback)
-print(Cat2_payback)
-print(Cat3_payback)
+#print(Cat1_payback)
+#print(Cat2_payback)
+#print(Cat3_payback)
 
 
-print(NumbStore1, NumbStore2, NumbStore3)
+#print(NumbStore1, NumbStore2, NumbStore3)
 
-data_matrix = [['Category', 'Number of Stores', 'CAPEX (£)', 'BioMethane Quantity (GW/h)'],
+'''data_matrix = [['Category', 'Number of Stores', 'CAPEX (£)', 'BioMethane Quantity (GWh)'],
                ['1', NumbStore1, cat1_capex, biometh_cat1],
                ['2', NumbStore2, cat2_capex, biometh_cat2],
                ['3', NumbStore3, cat3_capex, biometh_cat3],
                ['Overall Total', TotNumbStore, tot_capex, tot_biometh]]
 
 table = ff.create_table(data_matrix)
-py.offline.plot(table, filename='Results Summary table.html')
+py.offline.plot(table, filename='Results Summary table.html')'''
+
+print('Store Id',store3)
+print('Payback',payback3)
+print('H2P', h2p)
+print('CHP', CHP3)
 
 width = [average1, average2, average3]
 cum_width = np.cumsum(width)
