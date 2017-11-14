@@ -67,10 +67,11 @@ for id_store in range(id_store_min, id_store_max ):
             Gas_demand.append(Gas[0])
             Age.append(Store_age[0])
 
+
 #Inputs =======================================================================
-ind_variable = [Ele_demand, Age] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
+ind_variable = [Ele_demand] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
 ind_var_name = ['Electricity demand (kW)','Age (years']
-init_guess = [1,0.000001,1,0.01] 
+init_guess = [1,0.00001,1]  # 3 when 1 independant variable, 4 when 2 independant variables
 
 dep_variable = payback #Possible dependant variables: payback, carbon_savings, CHP_size
 dep_var_name = 'payback time (years)'
@@ -79,20 +80,12 @@ dep_var_name = 'payback time (years)'
 ind_variable = np.array(ind_variable, dtype=np.float64)
 dep_variable = np.array(dep_variable, dtype=np.float64)
 
-def func(x, a, b,c,d): 
-    return a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
-
-popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
-
-Target_test = dep_variable
-Target_pred = func(ind_variable, *popt)
-Relative_error = np.average(abs((Target_pred-Target_test)/Target_pred))*100
-print("Mean absolute error: %.2f" % mean_absolute_error(Target_test, Target_pred))
-print("Mean relative error: %.2f %%" % Relative_error)
-# Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % r2_score(Target_test, Target_pred))
-
 if len(ind_variable) == 1:
+    ind_variable = ind_variable[0]
+    def func(x, a, b, c): 
+        return a*np.exp(-b*x)+c
+    
+    popt, pcov = curve_fit(func, ind_variable, dep_variable, init_guess)
     X = np.linspace(min(ind_variable), max(ind_variable),len(ind_variable))
     Y = func(X, *popt)
     plt.plot(X, Y, 'b-', label='fit' )
@@ -103,6 +96,12 @@ if len(ind_variable) == 1:
     plt.show()
     
 elif len(ind_variable) == 2:
+
+    def func(x, a, b, c, d): 
+        return a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
+  
+    popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
+    
     fig = plt.figure(1)
     ax = Axes3D(fig)
     ax.scatter(ind_variable[0], ind_variable[1], dep_variable, zdir='z', s=20, c='r', depthshade=True)
@@ -119,6 +118,15 @@ elif len(ind_variable) == 2:
     ax.tick_params(axis='both', which='major', pad=-5)
     plt.show()
 
+
+#Calculate and print prediction error indicators
+Target_test = dep_variable
+Target_pred = func(ind_variable, *popt)
+Relative_error = np.average(abs((Target_pred-Target_test)/Target_pred))*100
+print("Mean absolute error: %.2f" % mean_absolute_error(Target_test, Target_pred))
+print("Mean relative error: %.2f %%" % Relative_error)
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(Target_test, Target_pred))
 
 
 
