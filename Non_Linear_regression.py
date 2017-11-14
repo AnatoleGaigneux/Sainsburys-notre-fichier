@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy import stats
 from scipy.optimize import curve_fit
 from sklearn.metrics import mean_absolute_error, r2_score
+import re
 
 database_path = "Sainsburys.sqlite"
 conn = sqlite3.connect(database_path)
@@ -27,6 +28,8 @@ Area = []
 Ele_demand = []
 Gas_demand = []
 Age = []
+carbon_savings = []
+CHP_size = []
 
 
 for id_store in range(id_store_min, id_store_max ):
@@ -56,6 +59,8 @@ for id_store in range(id_store_min, id_store_max ):
 
             solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
             payback.append(solution[4][1])
+            carbon_savings.append(solution[5][2])
+            CHP_size.extend(list(map(int, re.findall('\d+', solution[1]))))
             h2p.append(Gas[0]/Ele[0])
             Area.append(SurfaceArea[0])
             Ele_demand.append(Ele[0])
@@ -63,12 +68,12 @@ for id_store in range(id_store_min, id_store_max ):
             Age.append(Store_age[0])
 
 #Inputs =======================================================================
-ind_variable = [Ele_demand, Gas_demand]
-ind_var_name = ['Electricty demand (kW)','Gas demand (kW)']
-init_guess = [1,0.000001,1,0.000001] 
+ind_variable = [Ele_demand, Age] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
+ind_var_name = ['Electricity demand (kW)','Age (years']
+init_guess = [1,0.000001,1,0.01] 
 
-dep_variable = payback
-dep_var_name = 'Payback time (years)'
+dep_variable = payback #Possible dependant variables: payback, carbon_savings, CHP_size
+dep_var_name = 'payback time (years)'
 #==============================================================================
 
 ind_variable = np.array(ind_variable, dtype=np.float64)
@@ -81,7 +86,9 @@ popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
 
 Target_test = dep_variable
 Target_pred = func(ind_variable, *popt)
+Relative_error = np.average(abs((Target_pred-Target_test)/Target_pred))*100
 print("Mean absolute error: %.2f" % mean_absolute_error(Target_test, Target_pred))
+print("Mean relative error: %.2f %%" % Relative_error)
 # Explained variance score: 1 is perfect prediction
 print('Variance score: %.2f' % r2_score(Target_test, Target_pred))
 
