@@ -72,6 +72,7 @@ for id_store in range(id_store_min, id_store_max ):
                 payback1.append(solution[4][1])
 
             if category == 2:
+                print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
@@ -92,7 +93,9 @@ for id_store in range(id_store_min, id_store_max ):
                 payback3.append(solution[4][1])
                 h2p.append(Gas / Ele)
 
+#print(-np.array(financials1)/abs(np.array(carbon1)))
 
+print(-np.array(financials2)/abs(np.array(carbon2)))
 '''plt.figure(1)
 plt.plot(store1, financials1, 'ro', label='cat1')
 plt.plot(store2, financials2, 'bo', label='cat2')
@@ -149,19 +152,55 @@ Cat3_payback=np.average(payback3)
 
 #print(NumbStore1, NumbStore2, NumbStore3)
 
-'''data_matrix = [['Category', 'Number of Stores', 'CAPEX (£)', 'BioMethane Quantity (GWh)'],
+data_matrix = [['Category', 'Number of Stores', 'CAPEX (£)', 'BioMethane Quantity (GWh)'],
                ['1', NumbStore1, cat1_capex, biometh_cat1],
                ['2', NumbStore2, cat2_capex, biometh_cat2],
                ['3', NumbStore3, cat3_capex, biometh_cat3],
                ['Overall Total', TotNumbStore, tot_capex, tot_biometh]]
 
 table = ff.create_table(data_matrix)
-py.offline.plot(table, filename='Results Summary table.html')'''
+py.offline.plot(table, filename='Results Summary table.html')
 
-print('Store Id',store3)
-print('Payback',payback3)
-print('H2P', h2p)
-print('CHP', CHP3)
+Bigstores=np.transpose(store3)
+Payback3=np.transpose(payback3)
+CAPEX=np.transpose(capex3)
+Heat2Power=np.transpose(h2p)
+CHP=np.transpose(CHP3)
+Financial=np.transpose(-np.array(financials3)/abs(np.array(carbon3)))
+C2C=np.transpose(np.array(carbon3)*1000/np.array(capex3))
+
+#print(Bigstores)
+#print(Payback3)
+#print(CAPEX)
+
+data_matrix = [['Store ID', 'Payback', 'CAPEX (£)','Heat to Power Ratio','CHP','Financial Benefit(£/tCo2)','Carbon Savings/Capex kgCO2/£'],
+               [Bigstores.item(0), Payback3.item(0), CAPEX.item(0),Heat2Power.item(0),CHP.item(0),Financial.item(0),C2C.item(0)],
+               [Bigstores.item(1), Payback3.item(1), CAPEX.item(1),Heat2Power.item(1),CHP.item(1),Financial.item(1),C2C.item(1)],
+               [Bigstores.item(2), Payback3.item(2), CAPEX.item(2),Heat2Power.item(2),CHP.item(2),Financial.item(2),C2C.item(2)],
+               [Bigstores.item(3), Payback3.item(3), CAPEX.item(3),Heat2Power.item(3),CHP.item(3),Financial.item(3),C2C.item(3)],
+               [Bigstores.item(4), Payback3.item(4), CAPEX.item(4),Heat2Power.item(4),CHP.item(4),Financial.item(4),C2C.item(4)],
+               [Bigstores.item(5), Payback3.item(5), CAPEX.item(5),Heat2Power.item(5),CHP.item(5),Financial.item(5),C2C.item(5)],
+               [Bigstores.item(6), Payback3.item(6), CAPEX.item(6),Heat2Power.item(6),CHP.item(6),Financial.item(6),C2C.item(6)],
+               [Bigstores.item(7), Payback3.item(7), CAPEX.item(7),Heat2Power.item(7),CHP.item(7),Financial.item(7),C2C.item(7)],
+               [Bigstores.item(8), Payback3.item(8), CAPEX.item(8),Heat2Power.item(8),CHP.item(8),Financial.item(8),C2C.item(8)],
+               [Bigstores.item(9), Payback3.item(9), CAPEX.item(9),Heat2Power.item(9),CHP.item(9),Financial.item(9),C2C.item(9)],
+               [Bigstores.item(10), Payback3.item(10), CAPEX.item(10),Heat2Power.item(10),CHP.item(10),Financial.item(10),C2C.item(10)],
+               [Bigstores.item(11), Payback3.item(11), CAPEX.item(11),Heat2Power.item(11),CHP.item(11),Financial.item(11),C2C.item(11)],
+               [Bigstores.item(12), Payback3.item(12), CAPEX.item(12),Heat2Power.item(12),CHP.item(12),Financial.item(12),C2C.item(12)],
+               [Bigstores.item(13), Payback3.item(13), CAPEX.item(13),Heat2Power.item(13),CHP.item(13),Financial.item(13),C2C.item(13)],
+               [Bigstores.item(14), Payback3.item(14), CAPEX.item(14),Heat2Power.item(14),CHP.item(14),Financial.item(14),C2C.item(14)],
+               [Bigstores.item(15), Payback3.item(15), CAPEX.item(15),Heat2Power.item(15),CHP.item(15),Financial.item(15),C2C.item(15)],
+               [Bigstores.item(16), Payback3.item(16), CAPEX.item(16),Heat2Power.item(16),CHP.item(16),Financial.item(16),C2C.item(16)],
+               [Bigstores.item(17), Payback3.item(17), CAPEX.item(17),Heat2Power.item(17),CHP.item(17),Financial.item(17),C2C.item(17)]]
+
+table = ff.create_table(data_matrix)
+py.offline.plot(table, filename='Category 3 breakdown.html')
+
+
+#print('Store Id',store3)
+#print('Payback',payback3)
+#print('H2P', h2p)
+#print('CHP', CHP3)
 
 width = [average1, average2, average3]
 cum_width = np.cumsum(width)
