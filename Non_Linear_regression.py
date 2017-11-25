@@ -30,9 +30,11 @@ Gas_demand = []
 Age = []
 carbon_savings = []
 CHP_size = []
+Capex = []
 
 
-for id_store in range(id_store_min, id_store_max ):
+for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
+
     goodIO = 0
     cur.execute('''SELECT Ele, Gas FROM Demand_Check Where Stores_id= {vn1}'''.format(vn1=id_store))
     checkIO = cur.fetchall()
@@ -60,21 +62,22 @@ for id_store in range(id_store_min, id_store_max ):
             solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
             payback.append(solution[4][1])
             carbon_savings.append(solution[5][2])
+            Capex.append(solution[4][5])
             CHP_size.extend(list(map(int, re.findall('\d+', solution[1]))))
             h2p.append(Gas[0]/Ele[0])
             Area.append(SurfaceArea[0])
             Ele_demand.append(Ele[0])
             Gas_demand.append(Gas[0])
             Age.append(Store_age[0])
-
+            
 
 #Inputs =======================================================================
-ind_variable = [Ele_demand] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
-ind_var_name = ['Electricity demand (kW)','Age (years']
+ind_variable = [Ele_demand, h2p] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
+ind_var_name = ['Electricity demand (kW)','heat to power ratio']
 init_guess = [1,0.00001,1]  # 3 when 1 independant variable, 4 when 2 independant variables
 
-dep_variable = payback #Possible dependant variables: payback, carbon_savings, CHP_size
-dep_var_name = 'payback time (years)'
+dep_variable = carbon_savings #Possible dependant variables: payback, carbon_savings, CHP_size, Capex
+dep_var_name = 'carbon savings (tCO2e)'
 #==============================================================================
 
 ind_variable = np.array(ind_variable, dtype=np.float64)
@@ -82,9 +85,9 @@ dep_variable = np.array(dep_variable, dtype=np.float64)
 
 if len(ind_variable) == 1:
     ind_variable = ind_variable[0]
-    def func(x, a, b, c): 
-        return a*np.exp(-b*x)+c
-    
+    def func(x, a, b): 
+        return a*x+b
+#    a*np.exp(-b*x)+c
     popt, pcov = curve_fit(func, ind_variable, dep_variable, init_guess)
     X = np.linspace(min(ind_variable), max(ind_variable),len(ind_variable))
     Y = func(X, *popt)
@@ -97,9 +100,9 @@ if len(ind_variable) == 1:
     
 elif len(ind_variable) == 2:
 
-    def func(x, a, b, c, d): 
-        return a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
-  
+    def func(x, a, b, c): 
+        return a*x[0] + b*x[1] + c
+    #a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
     popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
     
     fig = plt.figure(1)
@@ -122,9 +125,10 @@ elif len(ind_variable) == 2:
 #Calculate and print prediction error indicators
 Target_test = dep_variable
 Target_pred = func(ind_variable, *popt)
-Relative_error = np.average(abs((Target_pred-Target_test)/Target_pred))*100
+for i in range(0, len(Target_pred)):
+    Relative_error = abs((Target_pred[i]-Target_test[i])/Target_pred[i])*100
 print("Mean absolute error: %.2f" % mean_absolute_error(Target_test, Target_pred))
-print("Mean relative error: %.2f %%" % Relative_error)
+print("Mean relative error: %.2f %%" % np.average(Relative_error))
 # Explained variance score: 1 is perfect prediction
 print('Variance score: %.2f' % r2_score(Target_test, Target_pred))
 
