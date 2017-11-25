@@ -38,16 +38,17 @@ stores = []
 
 
 for id_store in range(id_store_min, id_store_max ):
-        cur.execute(
-            '''SELECT GD2016, ED2016, Carbon FROM Stores Where id= {vn1}'''.format(
-                vn1=id_store))
-        Index = cur.fetchall()
-        Gas = np.array([elt[0] for elt in Index])
-        Ele = np.array([elt[1] for elt in Index])
-        carbon = np.array([elt[2] for elt in Index])
+    cur.execute(
+        '''SELECT GD2016, ED2016, Carbon FROM Stores Where id= {vn1}'''.format(
+            vn1=id_store))
+    Index = cur.fetchall()
+    Gas = np.array([elt[0] for elt in Index])
+    Ele = np.array([elt[1] for elt in Index])
+    carbon = np.array([elt[2] for elt in Index])
 
-        if (Gas or Ele) and (Gas and Ele) != None:
-
+#        if (Gas or Ele) and (Gas and Ele) != None:
+    if Ele != None:
+        if Gas != None:
             h2p.append(Gas[0]/Ele[0])
             Ele_demand.append(Ele[0])
             payback.append(34.3592*np.exp(-8.42461e-07*Ele[0])+6.88398*np.exp(-1.02012*Gas[0]/Ele[0]))
@@ -55,13 +56,23 @@ for id_store in range(id_store_min, id_store_max ):
             BAU_carbon.append(carbon)
             capex.append(0.0645517*Ele[0]+3507.16*Gas[0]/Ele[0]+444207)
             stores.append(id_store)
-            Data =np.row_stack((payback, carbon_savings, capex, stores))    
-            idx = np.argsort(Data[0])
-            Sorted_data = Data[:,idx]
+
+        else:
+            h2p.append(0.64502270251431926)
+            Ele_demand.append(Ele[0])
+            payback.append(34.3592*np.exp(-8.42461e-07*Ele[0])+6.88398*np.exp(-1.02012*0.64502270251431926))
+            carbon_savings.append(0.000260365*Ele[0]+542.343*0.64502270251431926-429.405)
+            BAU_carbon.append(carbon)
+            capex.append(0.0645517*Ele[0]+3507.16*0.64502270251431926+444207)
+            stores.append(id_store)
+            
+Data =np.row_stack((payback, carbon_savings, capex, stores))    
+idx = np.argsort(Data[0])
+Sorted_data = Data[:,idx]          
 
 Emission_reduction_max = 0
         
-for k in np.arange(1,10,0.01):
+for k in np.arange(9.5,10,0.0001):
     time = np.arange(2017,2051)
     annual_invest = k #million p.a.
     
@@ -118,7 +129,7 @@ y = BAU_emissions-Cum_carbon_savings
 plt.plot(x, y, 'ro')
 plt.xlabel('time (years)')
 plt.ylabel('Emissions (tCO2)')
-plt.ylim(0,450000)
+plt.ylim(0,550000)
 for i, txt in enumerate(np.diff(number_CHP_installed)):
     plt.annotate(txt, (x[i],y[i]))
     

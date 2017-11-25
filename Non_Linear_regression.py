@@ -31,6 +31,7 @@ Age = []
 carbon_savings = []
 CHP_size = []
 Capex = []
+cum_disc_cashflow = []
 
 
 for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
@@ -63,6 +64,7 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
             payback.append(solution[4][1])
             carbon_savings.append(solution[5][2])
             Capex.append(solution[4][5])
+            cum_disc_cashflow.append(solution[4][4])
             CHP_size.extend(list(map(int, re.findall('\d+', solution[1]))))
             h2p.append(Gas[0]/Ele[0])
             Area.append(SurfaceArea[0])
@@ -70,13 +72,14 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
             Gas_demand.append(Gas[0])
             Age.append(Store_age[0])
             
+MAC = -1*np.array(cum_disc_cashflow)/abs(np.array(carbon_savings))
 
 #Inputs =======================================================================
 ind_variable = [Ele_demand, h2p] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
 ind_var_name = ['Electricity demand (kW)','heat to power ratio']
-init_guess = [1,0.00001,1]  # 3 when 1 independant variable, 4 when 2 independant variables
+init_guess = [1,0.00001,1,1]  # 3 when 1 independant variable, 4 when 2 independant variables
 
-dep_variable = carbon_savings #Possible dependant variables: payback, carbon_savings, CHP_size, Capex
+dep_variable = MAC #Possible dependant variables: payback, carbon_savings, CHP_size, Capex
 dep_var_name = 'carbon savings (tCO2e)'
 #==============================================================================
 
@@ -85,9 +88,9 @@ dep_variable = np.array(dep_variable, dtype=np.float64)
 
 if len(ind_variable) == 1:
     ind_variable = ind_variable[0]
-    def func(x, a, b): 
-        return a*x+b
-#    a*np.exp(-b*x)+c
+    def func(x, a, b,c): 
+        return a*np.exp(-b*x)+c
+#    a*x+b
     popt, pcov = curve_fit(func, ind_variable, dep_variable, init_guess)
     X = np.linspace(min(ind_variable), max(ind_variable),len(ind_variable))
     Y = func(X, *popt)
@@ -100,9 +103,9 @@ if len(ind_variable) == 1:
     
 elif len(ind_variable) == 2:
 
-    def func(x, a, b, c): 
-        return a*x[0] + b*x[1] + c
-    #a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
+    def func(x, a, b, c, d): 
+        return a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
+    #a*x[0] + b*x[1] + c
     popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
     
     fig = plt.figure(1)
