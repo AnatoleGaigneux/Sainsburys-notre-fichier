@@ -32,7 +32,7 @@ carbon_savings = []
 CHP_size = []
 Capex = []
 cum_disc_cashflow = []
-
+financial_savings = []
 
 for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
 
@@ -66,6 +66,7 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != 2164):
             Capex.append(solution[4][5])
             cum_disc_cashflow.append(solution[4][4])
             CHP_size.extend(list(map(int, re.findall('\d+', solution[1]))))
+            financial_savings.append(solution[4][0])
             h2p.append(Gas[0]/Ele[0])
             Area.append(SurfaceArea[0])
             Ele_demand.append(Ele[0])
@@ -77,9 +78,9 @@ MAC = -1*np.array(cum_disc_cashflow)/abs(np.array(carbon_savings))
 #Inputs =======================================================================
 ind_variable = [Ele_demand, h2p] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
 ind_var_name = ['Electricity demand (kW)','heat to power ratio']
-init_guess = [1,0.00001,1,1]  # 3 when 1 independant variable, 4 when 2 independant variables
+init_guess = [1,0.0001,-5000]  # 3 when 1 independant variable, 4 when 2 independant variables
 
-dep_variable = MAC #Possible dependant variables: payback, carbon_savings, CHP_size, Capex
+dep_variable = financial_savings #Possible dependant variables: payback, carbon_savings, CHP_size, Capex, financial_savings
 dep_var_name = 'carbon savings (tCO2e)'
 #==============================================================================
 
@@ -103,9 +104,9 @@ if len(ind_variable) == 1:
     
 elif len(ind_variable) == 2:
 
-    def func(x, a, b, c, d): 
-        return a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
-    #a*x[0] + b*x[1] + c
+    def func(x, a, b, c): 
+        return a*x[0] + b*x[1] + c
+    #a*np.exp((-b)*x[0])+c*np.exp((-d)*x[1])
     popt, pcov = curve_fit(func, ind_variable, dep_variable, p0 = init_guess)
     
     fig = plt.figure(1)
@@ -134,6 +135,5 @@ print("Mean absolute error: %.2f" % mean_absolute_error(Target_test, Target_pred
 print("Mean relative error: %.2f %%" % np.average(Relative_error))
 # Explained variance score: 1 is perfect prediction
 print('Variance score: %.2f' % r2_score(Target_test, Target_pred))
-
 
 
