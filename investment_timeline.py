@@ -121,130 +121,158 @@ py.offline.plot(table, filename='Outliers table.html')
 # CREATION OF INVESTMENT TIMELINE
 # =============================================================================
 
-#initialize matrices
-cash_out = []
-Carbon_saved_per_CHP = []
-number_CHP_installed = []
-num_viable_store = []    
-Total_year_invest = []
-Total_year_carbon = []
-Total_year_cum_disc_cashflow =[]
-Total_year_financial_savings = []
+#initialize matrices uses in plots
+Y= []
+Y1 = []
+Y2= []
+y = []
+Sorted_a = []
+Op_cost_reduction = []
+Emission_reduction_tot_footprint = []
+Emission_reduction_BAU = []
 
-time = np.arange(2017,2051)
-annual_invest = 9.9 #million p.a. #append for different scenarios
+annual_invest_list = [5,7,9.9]
+for i in annual_invest_list :
+    #initialize matrices
+    cash_out = []
+    Carbon_saved_per_CHP = []
+    number_CHP_installed = []
+    num_viable_store = []    
+    Total_year_invest = []
+    Total_year_carbon = []
+    Total_year_cum_disc_cashflow =[]
+    Total_year_financial_savings = []
+    
+    time = np.arange(2017,2051)
+    annual_invest = i #million p.a. #append for different scenarios
+            
+    #Initialize values
+    Cash_balance = 0
+    j = 0
+    n = 0
+    capex_needed = Sorted_data[2][j]/10**6
+    
+    # Find number of CHP invested in for each year and resulting carbon savings and capex, assuming a certain annual investment
+    for i in range(0, len(time)) :
+        Cash_balance = Cash_balance + annual_invest
+        Individual_carbon_savings = []
+        Individual_invest = []
+        Individual_cum_disc_cashflow = []
+        Individual_financial_saving = []
+        try:
+            while capex_needed<Cash_balance:
+                cash_out = capex_needed
+                Individual_invest.append(cash_out)
+                Individual_carbon_savings.append(Sorted_data[1][j])
+                Individual_cum_disc_cashflow.append(Sorted_data[4][j])
+                Individual_financial_saving.append(Sorted_data[6][j])
+                if Sorted_data[4][j]<0:
+                    n = n+1
+                j= j+1
+                capex_needed = Sorted_data[2][j]/10**6
+                Cash_balance = Cash_balance -cash_out
+    
+        except:
+            pass
+    #   print(Individual_cum_disc_cashflow)
+        number_CHP_installed.append(j)
+        num_viable_store.append(n)
+        Total_year_invest.append(np.sum(Individual_invest))
+        Total_year_carbon.append(np.sum(Individual_carbon_savings))
+        Total_year_cum_disc_cashflow.append(np.average(Individual_cum_disc_cashflow))
+        Total_year_financial_savings.append(np.sum(Individual_financial_saving))
+    
+    
+    Cum_invest = np.cumsum(Total_year_invest)
+    Cum_carbon_savings = np.cumsum(Total_year_carbon)
+    Cum_financial_savings = np.cumsum(Total_year_financial_savings)
+    
+    
+        # Get potential carbon starting points for timeline
+    BAU_operating_cost = 175776739 #from master excel sheet
+    BAU_emissions = np.sum(BAU_carbon) #tCO2 from supermarkets where CHP will be implemented(from master excel data)
+    init_emissions = 1070000 #tCO2 during the year 2016-17 from report
+    #Create matrices to plot 
+    Y.append(BAU_operating_cost-Cum_financial_savings)
+    y.append(init_emissions-Cum_carbon_savings)
+    Op_cost_reduction.append(round(Cum_financial_savings[-1]/BAU_operating_cost*100,1))
+    Emission_reduction_tot_footprint.append(round(Cum_carbon_savings[-1]/init_emissions*100,1))
+    Emission_reduction_BAU.append((Cum_carbon_savings[-1]/BAU_emissions*100))
+    Y1.append(np.diff(num_viable_store))
+    Y2.append(np.diff(number_CHP_installed)-np.diff(num_viable_store))
+    
+    y_start=0
+    y_end=3
+    CHP_size_installed_by_year_y= Sorted_data[5][y_start:number_CHP_installed[y_end-1]]
+    a = Counter(np.array(CHP_size_installed_by_year_y,dtype=int))
+    a = np.transpose(np.array((list(a.items()))))
+    idx = np.argsort(a[0])
+    Sorted_a.append(a[:,idx])
 
-# Get potential carbon starting points for timeline
-init_emissions = 1070000 #tCO2 during the year 2016-17 from report
-BAU_emissions = np.sum(BAU_carbon) #tCO2 from supermarkets where CHP will be implemented(from master excel data)
-        
-#Initialize values
-Cash_balance = 0
-j = 0
-n = 0
-capex_needed = Sorted_data[2][j]/10**6
-
-# Find number of CHP invested in for each year and resulting carbon savings and capex, assuming a certain annual investment
-for i in range(0, len(time)) :
-    Cash_balance = Cash_balance + annual_invest
-    Individual_carbon_savings = []
-    Individual_invest = []
-    Individual_cum_disc_cashflow = []
-    Individual_financial_saving = []
-    try:
-        while capex_needed<Cash_balance:
-            cash_out = capex_needed
-            Individual_invest.append(cash_out)
-            Individual_carbon_savings.append(Sorted_data[1][j])
-            Individual_cum_disc_cashflow.append(Sorted_data[4][j])
-            Individual_financial_saving.append(Sorted_data[6][j])
-            if Sorted_data[4][j]<0:
-                n = n+1
-            j= j+1
-            capex_needed = Sorted_data[2][j]/10**6
-            Cash_balance = Cash_balance -cash_out
-
-    except:
-        pass
-#   print(Individual_cum_disc_cashflow)
-    number_CHP_installed.append(j)
-    num_viable_store.append(n)
-    Total_year_invest.append(np.sum(Individual_invest))
-    Total_year_carbon.append(np.sum(Individual_carbon_savings))
-    Total_year_cum_disc_cashflow.append(np.average(Individual_cum_disc_cashflow))
-    Total_year_financial_savings.append(np.sum(Individual_financial_saving))
 
 
-Cum_invest = np.cumsum(Total_year_invest)
-Cum_carbon_savings = np.cumsum(Total_year_carbon)
-Cum_financial_savings = np.cumsum(Total_year_financial_savings)
 
-
+# =============================================================================
+# PLOTS
+# =============================================================================
 
 
 #plot operating cost timeline
 plt.figure(1)
-BAU_operating_cost =  175776739 
-plt.plot(time, BAU_operating_cost-Cum_financial_savings)
+
+X=time
+plt.plot(X, Y[0],'dodgerblue', label='annual investment: £%s million' %annual_invest_list[0])
+plt.plot(X, Y[1],'blue', label='annual investment: £%s million' %annual_invest_list[1])
+plt.plot(X, Y[2],'navy', label='annual investment: £%s million' %annual_invest_list[2])
 plt.ylabel('Stores operating cost timeline £')
 plt.xlabel('time (years)')
-            #plt.ylim(0,180000000)
+plt.legend(loc=3)
 
-Op_cost_reduction = Cum_financial_savings[-1]/BAU_operating_cost*100
-print('Percentage operating cost reduced from 2016 total operating cost: %s %%' %Op_cost_reduction)
+plt.annotate('%s %%' %(100-Op_cost_reduction[0]), (X[-1],Y[0][-1]))
+plt.annotate('%s %%' %(100-Op_cost_reduction[1]), (X[-1],Y[1][-1]))
+plt.annotate('%s %%' %(100-Op_cost_reduction[2]), (X[-1],Y[2][-1]))
+
+
 
 #Plot emissions timeline
 plt.figure(2)
-x = time
-y = BAU_emissions-Cum_carbon_savings
-plt.plot(x, y)
+x=time
+plt.plot(x, y[0],'dodgerblue', label='annual investment: £%s million' %annual_invest_list[0])
+plt.plot(x, y[1],'blue', label='annual investment: £%s million' %annual_invest_list[1])
+plt.plot(x, y[2],'navy', label='annual investment: £%s million' %annual_invest_list[2])
 plt.xlabel('time (years)')
 plt.ylabel('Emissions (tCO2)')
-plt.ylim(0,550000)
+plt.legend(loc=3)
 
-#for i, txt in enumerate(np.transpose([np.diff(num_viable_store), np.diff(number_CHP_installed)])):
-#    txt = ('{}/{}'.format(txt[0], txt[1]))
-#    plt.annotate(txt, (x[i+1],y[i+1]))
-#    
-
-Emission_reduction_tot_footprint = Cum_carbon_savings[-1]/init_emissions*100
-Emission_reduction_BAU = (Cum_carbon_savings[-1]/BAU_emissions*100)
-print('Percentage emission reduced from 2016 total carbon footprint: %s %%' %Emission_reduction_tot_footprint)
-print('Percentage emission reduced from BAU: %s %%' %Emission_reduction_BAU)
+plt.annotate('%s %%' %(100-Emission_reduction_tot_footprint[0]), (x[-1],y[0][-1]))
+plt.annotate('%s %%' %(100-Emission_reduction_tot_footprint[1]), (x[-1],y[1][-1]))
+plt.annotate('%s %%' %(100-Emission_reduction_tot_footprint[2]), (x[-1],y[2][-1]))
 
 #bar chart presenting number of CHP installed per year
 plt.figure(3)
 ind = time[:-1] # number of bars
 width = 0.6
-p1 = plt.bar(ind, np.diff(num_viable_store), width, color='#d62728')
-p2 = plt.bar(ind, np.diff(number_CHP_installed)-np.diff(num_viable_store), width, bottom=np.diff(num_viable_store))
+p1 = plt.bar(ind, Y1[2], width, color='#d62728', hatch = '//')
+p2 = plt.bar(ind, Y2[2], width, bottom=Y1[2], color= 'navy', hatch ='///')
 
 plt.ylabel('Number of CHP installed')
 plt.title('')
 plt.xticks(ind)
-plt.yticks(np.arange(0,5+max(np.diff(number_CHP_installed))))
+plt.yticks(np.arange(0,max(np.diff(number_CHP_installed))))
 plt.legend((p1, p2), ('Viable', 'Non viable'))
 plt.show()
 
 #Histogram showing distribution of type of CHP for first y years
 plt.figure(4)
-y_start=0
-y_end=3
-CHP_size_installed_by_year_y= Sorted_data[5][y_start:number_CHP_installed[y_end-1]]
+ind = range(0,len(Sorted_a[2][1])) # number of bars
+width = 0.3
 
-a = Counter(np.array(CHP_size_installed_by_year_y,dtype=int))
-a = np.transpose(np.array((list(a.items()))))
-idx = np.argsort(a[0])
-Sorted_a = a[:,idx]
-
-ind = np.arange(len(Sorted_a[0])) # number of bars
-width = 0.35
-
-plt.bar(ind, Sorted_a[1], width, color='#d62728')
-
+plt.bar(ind, Sorted_a[2][1], width, color='navy',label='annual investment: £%s million' %annual_invest_list[2])      
+        
 plt.ylabel('number of CHPs')
 plt.xlabel('CHP size (MW)')
 plt.title('Size distribution of CHP installed by year %d' %(2017+y_end))
-plt.xticks(ind, (Sorted_a[0]))
+plt.xticks(ind, (Sorted_a[2][0]))
+plt.legend(loc=1)
 
 plt.show()
