@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import plotly.figure_factory as ff
 import plotly as py
 from collections import Counter
-
+from Non_Linear_regression_function import func1, func2, func3, func4, func5, popt1, popt2, popt3, popt4, popt5
 database_path = "Sainsburys.sqlite"
 conn = sqlite3.connect(database_path)
 cur = conn.cursor()
@@ -64,12 +64,12 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != (2164 and 
         if Gas != None:
             Ele=Ele/10**6 #GWh
             Gas=Gas/10**6 #GWh
-            Cum_disc_cashflow_calc = 419*Ele[0]+291*Gas[0]/Ele[0]-762  #thousand £ (NPV-capex)
-            payback_calc = 24.9*np.exp(-0.907*Ele[0])+4.96*np.exp(-1.09*Gas[0]/Ele[0]) #years
-            carbon_savings_calc = 367*Ele[0]+512*Gas[0]/Ele[0]-439 #tCO2
-            financial_savings_calc = 53.0*Ele[0]+33.0*Gas[0]/Ele[0]-35.0  #Thousands of £
+            Cum_disc_cashflow_calc = func4([Ele[0], Gas[0]/Ele[0]],*popt4)  #thousand £ (NPV-capex)
+            payback_calc = func1([Ele[0], Gas[0]/Ele[0]],*popt1) #years
+            carbon_savings_calc = func2([Ele[0], Gas[0]/Ele[0]],*popt2)#tCO2
+            financial_savings_calc = func3([Ele[0], Gas[0]/Ele[0]],*popt3)  #Thousands of £
             h2p_calc = Gas[0]/Ele[0]
-            CHP_size_calc = 151*Ele[0]-3.29 # in MW
+            CHP_size_calc = func5(Ele[0],*popt5) # in MW
             k=0
             for i in CHP_size_list:
                 diff = abs(CHP_size_calc-i)
@@ -96,12 +96,12 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != (2164 and 
             Ele=Ele/10**6 #GWh
             h2p.append(0.6450)
             Ele_demand.append(Ele[0])
-            payback.append(24.9*np.exp(-0.907*Ele[0])+4.96*np.exp(-1.09*0.6450))
-            carbon_savings.append(367*Ele[0]+512*0.6450-439)
+            payback.append(func1([Ele[0],0.6450],*popt1))
+            carbon_savings.append(func2([Ele[0],0.6450],*popt2))
             BAU_carbon.append(carbon[0])
             stores.append(id_store)
-            Cum_disc_cashflow.append(419*Ele[0]+291*0.6450-762)
-            CHP_size_calc = 151*Ele[0]-3.29
+            Cum_disc_cashflow.append(func4([Ele[0],0.6450],*popt4))
+            CHP_size_calc = func5(Ele[0],*popt5)
             k=0
             for i in CHP_size_list:
                 diff = abs(CHP_size_calc-i)
@@ -111,7 +111,7 @@ for id_store in (j for j in range(id_store_min, id_store_max) if j != (2164 and 
                 k=k+1
             CHP_size.append(closest_CHP_size)
             capex.append(capex_calc)
-            financial_savings.append(53.0*Ele[0]+33.0*0.6450-35.0)
+            financial_savings.append(func3([Ele[0],0.6450],*popt3))
             Stores.append(id_store)
             g=g+1
 # Data stored in matrix and sorted with respect to payback
@@ -143,7 +143,7 @@ Emission_reduction_tot_footprint = []
 Emission_reduction_BAU = []
 All_payback = []
 
-annual_invest_list = [10.59,10.59]
+annual_invest_list = [7.88,10.59]
 for i in annual_invest_list :
     #initialize matrices
     cash_out = []
@@ -237,13 +237,14 @@ for i in annual_invest_list :
 X=time
 
 #plot operating cost timeline
-plt.figure(1)
+plt.figure(6)
 
 plt.plot(X, Y[0],'dodgerblue', label='annual investment: £%s million' %annual_invest_list[0])
 plt.plot(X, Y[1],'blue', label='annual investment: £%s million' %annual_invest_list[1])
 plt.ylabel('Stores operating cost timeline (million £)')
 plt.xlabel('time (years)')
 plt.legend(loc=3)
+
 
 plt.annotate('Operating Cost\n remaining \n%s %%' %(100-Op_cost_reduction[0]), (X[-1],Y[0][-1]+3.5))
 plt.annotate('Operating Cost\n remaining \n%s %%' %(100-Op_cost_reduction[1]), (X[-1],Y[1][-1]+1))
@@ -252,11 +253,12 @@ plt.annotate('Operating Cost\n remaining \n%s %%' %(100-Op_cost_reduction[1]), (
 for i, txt in enumerate(All_payback[0]):
     plt.annotate(txt, (X[i],Y[0][i]*1.01), bbox={'facecolor':'white', 'pad':3})
 for i, txt in enumerate(All_payback[1]):
-    plt.annotate(txt, (X[i],Y[1][i]*0.978), bbox={'facecolor':'white', 'pad':3})
+    plt.annotate(txt, (X[i]-1,Y[1][i]*0.985), bbox={'facecolor':'white', 'pad':3})
+    
 
 
 #Plot emissions timeline
-plt.figure(2)
+plt.figure(7)
 plt.plot(X, y[0],'dodgerblue', label='annual investment: £%s million' %annual_invest_list[0])
 plt.plot(X, y[1],'blue', label='annual investment: £%s million' %annual_invest_list[1])
 plt.xlabel('time (years)')
@@ -267,7 +269,7 @@ plt.annotate('Emissions\n remaining:\n%s %%' %(100-Emission_reduction_tot_footpr
 plt.annotate('Emissions\n remaining:\n%s %%' %(100-Emission_reduction_tot_footprint[1]), (X[-1],y[1][-1]))
 
 #bar chart presenting number of CHP installed per year
-plt.figure(3)
+plt.figure(8)
 ind = time+1 # number of bars
 width = 0.6
 p1 = plt.bar(ind, Y1[0], width, color='#d62728', hatch = '//')
@@ -281,7 +283,7 @@ plt.legend((p1, p2), ('Financially benificial', 'Financially non beneficial'))
 plt.show()
 
 #Histogram showing distribution of type of CHP for first y years
-plt.figure(4)
+plt.figure(9)
 ind = range(0,len(Sorted_a[1][0])) # number of bars
 width = 0.3
 
@@ -334,8 +336,8 @@ for Elec in np.arange(0.77,4.58,0.01):
             max_financial_savings_error = financial_savings_error
             max_financial_savings_realtive_error = financial_savings_error*100/(53.0*Elec+33.0*0.6450-35.0)
             
-print(max_payback_error, max_payback_relative_error)
-print(max_CDCF_error, max_CDCF_relative_error)
-print(max_carbon_savings_error,max_carbon_savings_relative_error)
-print(max_financial_savings_error, max_financial_savings_realtive_error)
+#print(max_payback_error, max_payback_relative_error)
+#print(max_CDCF_error, max_CDCF_relative_error)
+#print(max_carbon_savings_error,max_carbon_savings_relative_error)
+#print(max_financial_savings_error, max_financial_savings_realtive_error)
 

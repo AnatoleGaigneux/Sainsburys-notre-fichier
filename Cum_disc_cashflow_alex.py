@@ -62,7 +62,8 @@ for id_store in range(id_store_min, id_store_max ):
             else:
                 print("Not able to categorise")
             if category == 1:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
+                #, ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL'
                 financials1.append(solution[4][4])
                 carbon1.append(solution[5][2])
                 store1.append(id_store)
@@ -72,8 +73,7 @@ for id_store in range(id_store_min, id_store_max ):
                 payback1.append(solution[4][1])
 
             if category == 2:
-                print(id_store)
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
                 store2.append(id_store)
@@ -83,7 +83,7 @@ for id_store in range(id_store_min, id_store_max ):
                 payback2.append(solution[4][1])
 
             if category == 3:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
                 financials3.append(solution[4][4])
                 carbon3.append(solution[5][2])
                 store3.append(id_store)
@@ -207,7 +207,7 @@ cum_width = np.cumsum(width)
 ind = [width[0]/2, (cum_width[1]-cum_width[0])/2+cum_width[0], (cum_width[2]-cum_width[1])/2+cum_width[1]]
 
 plt.figure(3)
-p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='none')
+p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='black')
 plt.xlabel('$tCO_2e$ yearly savings')
 plt.ylabel('$£/tCO_2e$')
 plt.title('MAC curves for each store category and CHP implementation 2016-17')
