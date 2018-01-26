@@ -72,7 +72,7 @@ for id_store in range(id_store_min, id_store_max ):
                 payback1.append(solution[4][1])
 
             if category == 2:
-                print(id_store)
+                #print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
@@ -83,6 +83,7 @@ for id_store in range(id_store_min, id_store_max ):
                 payback2.append(solution[4][1])
 
             if category == 3:
+                print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 financials3.append(solution[4][4])
                 carbon3.append(solution[5][2])

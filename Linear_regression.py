@@ -51,14 +51,15 @@ for id_store in range(id_store_min, id_store_max ):
             Ele = np.array([elt[2] for elt in Index])
             
             if SurfaceArea > 45000:
+                print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 payback.append(solution[4][1])
                 h2p.append(Gas/Ele)
                 Area.append(SurfaceArea)
-                
-          
+
+print(h2p)
 #Split data into training/testing sets
-                
+
 X1_train = Area[:-9]
 X1_test = Area[-9:]
 
@@ -76,7 +77,7 @@ target_test = payback[-9:]
 #fit a linear model
 
 lm = linear_model.LinearRegression()
-model = lm.fit(X_train, target_train)
+model = lm.fit(X1_train, target_train)
             
 #Make predictions using the testing sets
             
