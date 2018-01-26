@@ -62,7 +62,6 @@ for id_store in range(id_store_min, id_store_max ):
             else:
                 print("Not able to categorise")
             if category == 1:
-                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 financials1.append(solution[4][4])
                 carbon1.append(solution[5][2])
                 store1.append(id_store)
@@ -208,7 +207,6 @@ cum_width = np.cumsum(width)
 ind = [width[0]/2, (cum_width[1]-cum_width[0])/2+cum_width[0], (cum_width[2]-cum_width[1])/2+cum_width[1]]
 
 plt.figure(3)
-p1 = plt.bar(ind, MAC, width, linewidth=1, edgecolor='none')
 plt.xlabel('$tCO_2e$ yearly savings')
 plt.ylabel('$£/tCO_2e$')
 plt.title('MAC curves for each store category and CHP implementation 2016-17')
