@@ -71,8 +71,21 @@ for id_store in range(id_store_min, id_store_max ):
                 payback1.append(solution[4][1])
 
             if category == 2:
+<<<<<<< HEAD
                 #print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+                #print(id_store)
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+=======
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
+>>>>>>> 7c6a9eeee8cc04bfd18fb2b7b4ea6a6d03a183d7
+=======
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
+>>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
+>>>>>>> 5fafcba68a5f615a7f6c96073fc2b8188ec0ae9f
                 financials2.append(solution[4][4])
                 carbon2.append(solution[5][2])
                 store2.append(id_store)
@@ -82,8 +95,21 @@ for id_store in range(id_store_min, id_store_max ):
                 payback2.append(solution[4][1])
 
             if category == 3:
+<<<<<<< HEAD
                 print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+                print(id_store)
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
+=======
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
+>>>>>>> 7c6a9eeee8cc04bfd18fb2b7b4ea6a6d03a183d7
+=======
+                solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [10.6/8.787,2.35/2.618,1,1])
+>>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
+>>>>>>> 5fafcba68a5f615a7f6c96073fc2b8188ec0ae9f
                 financials3.append(solution[4][4])
                 carbon3.append(solution[5][2])
                 store3.append(id_store)
