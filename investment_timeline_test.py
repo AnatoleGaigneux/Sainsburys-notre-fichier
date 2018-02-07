@@ -55,68 +55,70 @@ g=0
 
 for id_store in (j for j in range(id_store_min, id_store_max) if j != (2164 and 490 and 2019 and 2020 and 2035 and 2043 and 2107 and 2116 and 2500)): # 2164 is an outlier not used in the regression model, all the rest are convienience stores
     cur.execute(
-        '''SELECT GD2016, ED2016, Carbon, Area FROM Stores Where id= {vn1}'''.format(
+        '''SELECT GD2016, ED2016, Carbon, Area, ExistingTech FROM Stores Where id= {vn1}'''.format(
             vn1=id_store))
     Index = cur.fetchall()
     
     Gas = np.array([elt[0] for elt in Index])  #kWh
     Ele = np.array([elt[1] for elt in Index]) #kWh
     carbon = np.array([elt[2] for elt in Index])
-    Area = np.array([elt[3] for elt in Index])  
-    if Ele != None:
-        if Gas != None:
-            Ele=Ele/10**6 #GWh
-            Gas=Gas/10**6 #GWh
-            Cum_disc_cashflow_calc = func4([Ele[0], Gas[0]/Ele[0]],*popt4)  #thousand £ (NPV-capex)
-            payback_calc = func1([Ele[0], Gas[0]/Ele[0]],*popt1) #years
-            carbon_savings_calc = func2([Ele[0], Gas[0]/Ele[0]],*popt2)#tCO2
-            financial_savings_calc = func3([Ele[0], Gas[0]/Ele[0]],*popt3)  #Thousands of £
-            h2p_calc = Gas[0]/Ele[0]
-            CHP_size_calc = func5(Ele[0],*popt5) # in MW
-            k=0
-            for i in CHP_size_list:
-                diff = abs(CHP_size_calc-i)
-                if diff<abs(CHP_size_calc-closest_CHP_size):
-                    closest_CHP_size = i
-                    capex_calc = (Tech_price[k]*(1-ECA_value)+Hidden_costs)/10**6 #million £
-                k=k+1
-            if h2p_calc >1.331: #create matrix of outliers and doesn't include them in timeline
-                outliers.append([id_store, Area[0], round(h2p_calc,2), round(Ele[0],2), int(Cum_disc_cashflow_calc), round(payback_calc,1)])
-            else:
-                h2p.append(h2p_calc) 
+    Area = np.array([elt[3] for elt in Index])
+    ExistingTech = np.array([elt[4] for elt in Index])
+    if ExistingTech != 'GSHP':
+        if Ele != None:
+            if Gas != None:
+                Ele=Ele/10**6 #GWh
+                Gas=Gas/10**6 #GWh
+                Cum_disc_cashflow_calc = func4([Ele[0], Gas[0]/Ele[0]],*popt4)  #thousand £ (NPV-capex)
+                payback_calc = func1([Ele[0], Gas[0]/Ele[0]],*popt1) #years
+                carbon_savings_calc = func2([Ele[0], Gas[0]/Ele[0]],*popt2)#tCO2
+                financial_savings_calc = func3([Ele[0], Gas[0]/Ele[0]],*popt3)  #Thousands of £
+                h2p_calc = Gas[0]/Ele[0]
+                CHP_size_calc = func5(Ele[0],*popt5) # in MW
+                k=0
+                for i in CHP_size_list:
+                    diff = abs(CHP_size_calc-i)
+                    if diff<abs(CHP_size_calc-closest_CHP_size):
+                        closest_CHP_size = i
+                        capex_calc = (Tech_price[k]*(1-ECA_value)+Hidden_costs)/10**6 #million £
+                    k=k+1
+                if h2p_calc >1.331: #create matrix of outliers and doesn't include them in timeline
+                    outliers.append([id_store, Area[0], round(h2p_calc,2), round(Ele[0],2), int(Cum_disc_cashflow_calc), round(payback_calc,1)])
+                else:
+                    h2p.append(h2p_calc) 
+                    Ele_demand.append(Ele[0])
+                    payback.append(payback_calc) #from regression model
+                    carbon_savings.append(carbon_savings_calc) #from regression model
+                    BAU_carbon.append(carbon[0])
+                    capex.append(capex_calc) #from regression model
+                    stores.append(id_store)
+                    Cum_disc_cashflow.append(Cum_disc_cashflow_calc) #from regression model
+                    CHP_size.append(closest_CHP_size)
+                    financial_savings.append(financial_savings_calc)
+                    Stores.append(id_store)
+                    m=m+1
+            else: # When no Gas demand is available, average h2p ratio is used
+                Ele=Ele/10**6 #GWh
+                h2p.append(0.6450)
                 Ele_demand.append(Ele[0])
-                payback.append(payback_calc) #from regression model
-                carbon_savings.append(carbon_savings_calc) #from regression model
+                payback.append(func1([Ele[0],0.6450],*popt1))
+                carbon_savings.append(func2([Ele[0],0.6450],*popt2))
                 BAU_carbon.append(carbon[0])
-                capex.append(capex_calc) #from regression model
                 stores.append(id_store)
-                Cum_disc_cashflow.append(Cum_disc_cashflow_calc) #from regression model
+                Cum_disc_cashflow.append(func4([Ele[0],0.6450],*popt4))
+                CHP_size_calc = func5(Ele[0],*popt5)
+                k=0
+                for i in CHP_size_list:
+                    diff = abs(CHP_size_calc-i)
+                    if diff<abs(CHP_size_calc-closest_CHP_size):
+                        closest_CHP_size = i
+                        capex_calc = (Tech_price[k]*(1-ECA_value)+Hidden_costs)/10**6 #million £
+                    k=k+1
                 CHP_size.append(closest_CHP_size)
-                financial_savings.append(financial_savings_calc)
+                capex.append(capex_calc)
+                financial_savings.append(func3([Ele[0],0.6450],*popt3))
                 Stores.append(id_store)
-                m=m+1
-        else: # When no Gas demand is available, average h2p ratio is used
-            Ele=Ele/10**6 #GWh
-            h2p.append(0.6450)
-            Ele_demand.append(Ele[0])
-            payback.append(func1([Ele[0],0.6450],*popt1))
-            carbon_savings.append(func2([Ele[0],0.6450],*popt2))
-            BAU_carbon.append(carbon[0])
-            stores.append(id_store)
-            Cum_disc_cashflow.append(func4([Ele[0],0.6450],*popt4))
-            CHP_size_calc = func5(Ele[0],*popt5)
-            k=0
-            for i in CHP_size_list:
-                diff = abs(CHP_size_calc-i)
-                if diff<abs(CHP_size_calc-closest_CHP_size):
-                    closest_CHP_size = i
-                    capex_calc = (Tech_price[k]*(1-ECA_value)+Hidden_costs)/10**6 #million £
-                k=k+1
-            CHP_size.append(closest_CHP_size)
-            capex.append(capex_calc)
-            financial_savings.append(func3([Ele[0],0.6450],*popt3))
-            Stores.append(id_store)
-            g=g+1
+                g=g+1
 # Data stored in matrix and sorted with respect to payback
 Data =np.row_stack((payback, carbon_savings, capex, stores, Cum_disc_cashflow, CHP_size, financial_savings, Stores, BAU_carbon))
 idx = np.argsort(Data[0])
