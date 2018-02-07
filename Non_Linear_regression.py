@@ -90,6 +90,10 @@ MAC = -1*np.array(cum_disc_cashflow)/abs(np.array(carbon_savings))
 ind_variable = [np.divide(Ele_demand,1000000),h2p] #possible independant variables: Ele_demand, Gas_demand, h2p, Area, Age
 ind_var_name = ['Electricity demand (GWh)','Heat to Power ratio']
 init_guess = [1,1,1]  # 3 when 1 independant variable, 4 when 2 independant variables
+<<<<<<< HEAD
+=======
+init_guess = [1,0.0001,-5000]  # 3 when 1 independant variable, 4 when 2 independant variables
+>>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
 
 dep_variable = carbon_savings #Possible dependant variables: payback, carbon_savings, CHP_size, Capex, financial_savings
 dep_var_name = 'CHP size (MW)'

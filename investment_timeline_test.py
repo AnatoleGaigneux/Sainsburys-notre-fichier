@@ -50,6 +50,12 @@ g=0
 # Go through all supermarkets of the business
 # Get the Gas and ELec demand from database (and only where Elec demand is available --> reduces the number of stores considered)
 
+<<<<<<< HEAD
+=======
+    
+
+
+>>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
 for id_store in (j for j in range(id_store_min, id_store_max) if j != (2164 and 490 and 2019 and 2020 and 2035 and 2043 and 2107 and 2116 and 2500)): # 2164 is an outlier not used in the regression model, all the rest are convienience stores
     cur.execute(
         '''SELECT GD2016, ED2016, Carbon, Area FROM Stores Where id= {vn1}'''.format(

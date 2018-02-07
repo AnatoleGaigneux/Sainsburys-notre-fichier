@@ -54,15 +54,14 @@ for id_store in range(id_store_min, id_store_max ):
             Ele = np.array([elt[2] for elt in Index])
             
             if SurfaceArea > 45000:
-                print(id_store)
                 solution = pb.CHPproblem(id_store).SimpleOpti5NPV(mod = [1.195,1,1,1], ECA_value = 0.26, table_string = 'Utility_Prices_Aitor _NoGasCCL')
                 payback.append(solution[4][1])
                 h2p.append(Gas/Ele)
                 Area.append(SurfaceArea)
-
-print(h2p)
+                
+          
 #Split data into training/testing sets
-
+                
 X1_train = Area[:-9]
 X1_test = Area[-9:]
 
@@ -75,47 +74,6 @@ X_test = np.column_stack((X1_test,X2_test))
 #Split targets into trainign/testing sets
 target_train = payback[:-9]
 target_test = payback[-9:]
-<<<<<<< HEAD:Linear_regression.py
-           
-            
-#fit a linear model
-
-lm = linear_model.LinearRegression()
-model = lm.fit(X1_train, target_train)
-            
-#Make predictions using the testing sets
-            
-target_pred = lm.predict(X_test)
-
-#get coefficents
-print('Coefficients: \n', lm.coef_)
-#print mean squared error
-print("Mean squared error: %.2f" % mean_squared_error(target_test, target_pred))
-# Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % r2_score(target_test, target_pred))
-
-#Plot outputs
-
-fig = plt.figure(1)
-ax = Axes3D(fig)
-ax.scatter(X1_test, X2_test, target_test, zdir='z', s=20, c='r', depthshade=True)
-
-X1_range = np.arange(min(Area),max(Area))
-X2_range =  np.arange(min(h2p),max(h2p))
-params = lm.coef_
-Y = X1_range*params[0]+ X2_range*params[1]+lm.intercept_
-ax.plot_surface(X1_range, X2_range, Y, cmap='binary', linewidth=0, antialiased=False)
-ax.set_xlabel('Area (ft2)')
-ax.set_ylabel('Heat to power')
-ax.set_zlabel('Payback time')
-ax.tick_params(axis='both', which='major', pad=-5)
-
-plt.figure(2)
-plt.plot(X2_train, 'ro')
-plt.plot(X2_test, 'bo')
-
-plt.show()
-=======
   
 
 X1_Nicco = np.random.randn(9)
@@ -195,4 +153,3 @@ plt.show
 #plt.plot(X2_test, 'bo')
 #'''
 #plt.show()
->>>>>>> 7c6a9eeee8cc04bfd18fb2b7b4ea6a6d03a183d7:Linear_regression_backup.py
