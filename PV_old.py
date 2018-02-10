@@ -36,32 +36,24 @@ class PVproblem:
         self.store.getWeatherData(self.time_start, self.time_stop)
         self.discount_rate = 0.09
         self.roof_max_weight =
-<<<<<<< HEAD
         self.roof_area=
 
-=======
-        self.roof_area= 
-        
->>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
     def putTechPV(self, tech_id): 
         self.tech = pvtc.tech(tech_id)
 
         
     def OptiPVpanels(self, tech_range):
-<<<<<<< HEAD
         tech_opex = 0
         Elec_grid = 0
         Elec_surplus = 0
         for tech_id in tech_range:
             #initialize
 
-=======
 
         for tech_id in tech_range:
             #initialize
             Elec_grid = 0
             Elec_surplus = 0
->>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
             self.putTech(tech_id)
             tech_name = self.tech.tech_name
             tech_price = self.tech.tech_price*(1-ECA_value)          
@@ -69,20 +61,13 @@ class PVproblem:
             tech_eff= self.tech.eff
             tech_area=self.tech.area
             tech_weight=self.tech.weight
-<<<<<<< HEAD
             Store_demand = self.store.d_ele
-=======
->>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
-            
+
             if tech_weight/tech_area < roof_max_weight:
                 Indiv_Elec_prod = tech_eff*irradiance
                 N_panel = int(roof_area/tech_area)
                 Total_Elec_prod = N_panel*Indiv_Elec_prod
-<<<<<<< HEAD
-
-=======
                 Store_demand = self.store.d_ele
->>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
                 if Total_Elec_prod> Store_demand:
                     Elec_surplus = Total_Elec_prod- Store_demand
                 else:
@@ -90,7 +75,6 @@ class PVproblem:
                     
             #Costs
             capex=N_panel*tech_price
-<<<<<<< HEAD
             Opex_savings = Total_Elec_prod*tech_lifetime
             Opex=gas_demand*gas_price+(Elec_grid-Elec_surplus)*price_elec - policies*Total_Elec_prod
             if Opex_savings>tech_opex:
@@ -100,12 +84,10 @@ class PVproblem:
             return(best_tech,Opex_savings,capex,Opex)
 
 
-=======
             Opex_savings = 
             Opex=gas_demand*gas_price+(Elec_grid-elec_surplus)*price_elec - policies*Total_Elec_prod
 
             
->>>>>>> ab7c22c72b825faafb527b172d703bb2175d58aa
     def calculate_financials(self, discount_rate, tech_lifetime, year_BAU_cost, year_op_cost, Total_capex):
             year_savings = year_BAU_cost - year_op_cost
             payback = Total_capex/year_savings           
