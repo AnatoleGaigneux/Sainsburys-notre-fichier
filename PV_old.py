@@ -34,6 +34,12 @@ class PVproblem:
         self.store.getSimplePrice(self.time_start, self.time_stop, self.price_table)
         self.store.getSimpleDemand(self.time_start, self.time_stop)
         self.store.getWeatherData(self.time_start, self.time_stop)
+<<<<<<< HEAD
+        self.discount_rate = 0.09
+        self.roof_max_weight =
+        self.roof_area=
+
+=======
         #put self. back 
         discount_rate = 0.09
         roof_max_weight = 16 #(kg/m2)
@@ -43,11 +49,17 @@ class PVproblem:
         roof_available_area= roof_area*Roof_space_coeff #m2
 
         
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 8901107b834b5d0c09f99a6692f2de2c9649529a
+>>>>>>> a0df21a56162ff15b5f73360a125994640aaac31
     def putTechPV(self, tech_id): 
         self.tech = pvtc.tech(tech_id)
 
         
+<<<<<<< HEAD
     def OptiPVpanels(self, method = None, tech_range = None, time_start = None, time_stop = None, table_string = None, ECA_value = 0, uncertainty = None, mod = None):
         if time_start is not None or time_stop is not None or table_string is not None: 
                 old_time_start = self.time_start; old_time_stop = self.time_stop;  old_price_table = self.price_table
@@ -61,6 +73,83 @@ class PVproblem:
         opti_savings=0
         
     
+=======
+    def OptiPVpanels(self, tech_range):
+<<<<<<< HEAD
+        tech_opex = 0
+        Elec_grid = 0
+        Elec_surplus = 0
+        for tech_id in tech_range:
+            #initialize
+
+=======
+
+    tech_opex = 0
+    Elec_grid = 0
+    Elec_surplus = 0
+    for tech_id in tech_range:
+            #initialize
+
+
+>>>>>>> 8901107b834b5d0c09f99a6692f2de2c9649529a
+
+        for tech_id in tech_range:
+            # initialize
+            discount_rate = 0.09
+            roof_max_weight = 8 #(kg/m2)
+            roof_area= 400 #m2
+
+            
+            tech_opex = 0
+            Elec_grid = 0
+            Elec_surplus = 0
+<<<<<<< HEAD
+            self.putTech(tech_id)
+            tech_name = self.tech.tech_name
+            tech_price = self.tech.tech_price*(1-ECA_value)          
+            tech_lifetime = self.tech.lifetime
+            tech_eff= self.tech.eff
+            tech_area=self.tech.area
+            tech_weight=self.tech.weight
+            Store_demand = self.store.d_ele
+
+            if tech_weight/tech_area < roof_max_weight:
+                Indiv_Elec_prod = tech_eff*irradiance
+                N_panel = int(roof_area/tech_area)
+                Total_Elec_prod = N_panel*Indiv_Elec_prod
+                Store_demand = self.store.d_ele
+                if Total_Elec_prod> Store_demand:
+                    Elec_surplus = Total_Elec_prod- Store_demand
+                else:
+                    Elec_grid = Store_demand - Total_Elec_prod
+                    
+            #Costs
+            capex=N_panel*tech_price
+            Opex_savings = Total_Elec_prod*tech_lifetime
+            Opex=gas_demand*gas_price+(Elec_grid-Elec_surplus)*price_elec - policies*Total_Elec_prod
+            if Opex_savings>tech_opex:
+                best_tech=tech_name
+            else:
+                tech_opex=opex_savings
+            return(best_tech,Opex_savings,capex,Opex)
+
+
+            Opex_savings = 
+            Opex=gas_demand*gas_price+(Elec_grid-elec_surplus)*price_elec - policies*Total_Elec_prod
+
+            
+    def calculate_financials(self, discount_rate, tech_lifetime, year_BAU_cost, year_op_cost, Total_capex):
+=======
+            #self.putTech(tech_id)
+            tech_name = 'Mono-Si'
+            tech_price = 0.048 #(£/Wp,yr)
+            tech_lifetime = 20
+            tech_eff = 0.1807
+            tech_area = 1.65 #(m2)
+            tech_weight = 19.1 #(kg)
+            #Store_demand = self.store.d_ele
+
+>>>>>>> a0df21a56162ff15b5f73360a125994640aaac31
 
         for id_tech_index in array_tech:
             tech_id = id_tech_index
@@ -99,9 +188,13 @@ class PVproblem:
             return (best_tech, Opex_savings, Total_capex)
 
         def calculate_financials(self, discount_rate, tech_lifetime, year_BAU_cost, year_op_cost, Total_capex):
+<<<<<<< HEAD
             numb_years = 10 #(self.time_stop-self.time_start)/2/24/365
             year_op_cost = sum(op_cost_HH_pound)/numb_years
             year_BAU_cost = 1330 #sum(BAU_op_cost_HH_pound)/numb_years
+=======
+>>>>>>> 8901107b834b5d0c09f99a6692f2de2c9649529a
+>>>>>>> a0df21a56162ff15b5f73360a125994640aaac31
             year_savings = year_BAU_cost - year_op_cost
             payback = Total_capex / year_savings
             ann_capex = -np.pmt(discount_rate, tech_lifetime, Total_capex)
